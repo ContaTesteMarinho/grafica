@@ -11,7 +11,7 @@ import com.feliphe.cursomc.repositories.CategoriaRepository;
 @Service
 public class CategoriaService {
 
-	@Autowired /*Automaticamente estânciada pelo spring*/
+	@Autowired /*Automáticamente estânciada pelo spring*/
 	private CategoriaRepository repo;
 	
 	public Categoria buscar(Integer id) {
