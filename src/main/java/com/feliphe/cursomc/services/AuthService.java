@@ -37,8 +37,8 @@ public class AuthService {
 		
 		clienteRepository.save(cliente);
 		emailService. sendNewPasswordEmail(cliente, newPass);
-	}
-
+	}	
+	
 	private String newPassword() {
 		char[] vet = new char[10];
 		for (int i = 0; i < vet.length; i++) {
