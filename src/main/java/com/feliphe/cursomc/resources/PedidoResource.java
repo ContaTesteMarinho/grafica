@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.feliphe.cursomc.domain.Categoria;
 import com.feliphe.cursomc.domain.Pedido;
-import com.feliphe.cursomc.dto.CategoriaDTO;
 import com.feliphe.cursomc.services.PedidoService;
 
 @RestController

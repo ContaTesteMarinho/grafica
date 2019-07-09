@@ -1,10 +1,9 @@
 package com.feliphe.cursomc.resources;
 
 import java.net.URI;
-import java.util.List;import java.util.stream.Collector;
+import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.criteria.CriteriaBuilder.In;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.servlet.mvc.method.annotation.UriComponentsBuilderMethodArgumentResolver;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.feliphe.cursomc.domain.Categoria;
 import com.feliphe.cursomc.dto.CategoriaDTO;
