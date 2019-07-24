@@ -22,6 +22,8 @@ import com.feliphe.cursomc.domain.Categoria;
 import com.feliphe.cursomc.dto.CategoriaDTO;
 import com.feliphe.cursomc.services.CategoriaService;
 
+import io.swagger.annotations.ApiOperation;
+
 @RestController
 @RequestMapping(value="/categorias")
 public class CategoriaResource {
@@ -29,6 +31,7 @@ public class CategoriaResource {
 	@Autowired
 	CategoriaService service;
 	
+	@ApiOperation(value="Retorna uma categoria pelo id")
 	@RequestMapping(value="/{id}", method=RequestMethod.GET)
 	public ResponseEntity<?> buscar(@PathVariable Integer id) {
 		
@@ -71,6 +74,7 @@ public class CategoriaResource {
 		return ResponseEntity.noContent().build();
 	}
 	
+	@ApiOperation(value="Retorna todas categorias")
 	@RequestMapping(method=RequestMethod.GET)
 	public ResponseEntity<List<CategoriaDTO>> findAll() {
 		
@@ -83,6 +87,7 @@ public class CategoriaResource {
 		return ResponseEntity.ok().body(categoriasDTO);
 	}
 	
+	@ApiOperation(value="Retorna categorias com paginação")
 	@RequestMapping(value="/page", method=RequestMethod.GET)
 	public ResponseEntity<Page<CategoriaDTO>> findPage(
 			@RequestParam(value="page", defaultValue="0") Integer page,
