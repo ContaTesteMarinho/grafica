@@ -19,33 +19,40 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.feliphe.cursomc.domain.enums.Status;
 
 @Entity
-public class Pedido implements Serializable{
+public class Pedido implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy=GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
-	
-	@JsonFormat(pattern="dd/MM/yyyy HH:mm")
+	private Integer status;
+
+	@JsonFormat(pattern = "dd/MM/yyyy HH:mm")
 	private Date instante;
-	
-	@OneToOne(cascade=CascadeType.ALL, mappedBy="pedido")
+
+	@OneToOne(cascade = CascadeType.ALL, mappedBy = "pedido")
 	private Pagamento pagamento;
-	
+
 	@ManyToOne
-	@JoinColumn(name="cliente_id")
+	@JoinColumn(name = "desconto_id")
+	private Desconto desconto;
+
+	@ManyToOne
+	@JoinColumn(name = "cliente_id")
 	private Cliente cliente;
-	
+
 	@ManyToOne
-	@JoinColumn(name="endereco_de_entrega_id")
+	@JoinColumn(name = "endereco_de_entrega_id")
 	private Endereco enderecoDeEntrega;
-	
-	@OneToMany(mappedBy="id.pedido")
+
+	@OneToMany(mappedBy = "id.pedido")
 	private Set<ItemPedido> itens = new HashSet<>();
-	
-	public Pedido() {}
+
+	public Pedido() {
+	}
 
 	public Pedido(Integer id, Date instante, Cliente cliente, Endereco enderecoDeEntrega) {
 		super();
@@ -55,16 +62,24 @@ public class Pedido implements Serializable{
 		this.enderecoDeEntrega = enderecoDeEntrega;
 	}
 
-	public double getValorTotal() {		
+	public double getValorTotal() {
 		return itens.stream().mapToDouble(itemPedido -> itemPedido.getSubTotal()).sum();
 	}
-	
+
 	public Integer getId() {
 		return id;
 	}
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public Status getStatus() {
+		return Status.toEnum(status);
+	}
+
+	public void setStatus(Status status) {
+		this.status = status.getCod();
 	}
 
 	public Date getInstante() {
@@ -81,6 +96,14 @@ public class Pedido implements Serializable{
 
 	public void setPagamento(Pagamento pagamento) {
 		this.pagamento = pagamento;
+	}
+
+	public Desconto getDesconto() {
+		return desconto;
+	}
+
+	public void setDesconto(Desconto desconto) {
+		this.desconto = desconto;
 	}
 
 	public Cliente getCliente() {
@@ -102,11 +125,11 @@ public class Pedido implements Serializable{
 	public Set<ItemPedido> getItens() {
 		return itens;
 	}
-	
+
 	public void setItens(Set<ItemPedido> itens) {
 		this.itens = itens;
 	}
-	
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -134,7 +157,7 @@ public class Pedido implements Serializable{
 
 	@Override
 	public String toString() {
-		
+
 		NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 		StringBuilder builder = new StringBuilder();
@@ -147,14 +170,14 @@ public class Pedido implements Serializable{
 		builder.append(", Situação do pagamento: ");
 		builder.append(getPagamento().getEstado().getDescricao());
 		builder.append("\nDetalhes:\n");
-		
+
 		for (ItemPedido ip : itens) {
 			builder.append(ip.toString());
 		}
-		
+
 		builder.append("Valor total: ");
 		builder.append(nf.format(getValorTotal()));
-		
+
 		return builder.toString();
 	}
 }

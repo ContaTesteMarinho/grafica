@@ -14,6 +14,8 @@ import com.feliphe.cursomc.domain.ItemPedido;
 import com.feliphe.cursomc.domain.PagamentoComBoleto;
 import com.feliphe.cursomc.domain.Pedido;
 import com.feliphe.cursomc.domain.enums.EstadoPagamento;
+import com.feliphe.cursomc.domain.enums.Status;
+import com.feliphe.cursomc.dto.PedidoDTO;
 import com.feliphe.cursomc.repositories.ItemPedidoRepository;
 import com.feliphe.cursomc.repositories.PagamentoRepository;
 import com.feliphe.cursomc.repositories.PedidoRepository;
@@ -26,68 +28,90 @@ public class PedidoService {
 
 	@Autowired
 	private PedidoRepository repo;
-	
+
 	@Autowired
 	private BoletoService boletoService;
-	
+
 	@Autowired
 	private PagamentoRepository pagtoRepo;
-	
+
 	@Autowired
 	private ProdutoService produtoService;
-	
+
 	@Autowired
 	private ItemPedidoRepository itemPedidoRepository;
-	
+
 	@Autowired
 	private ClienteService clienteService;
-	
+
 	@Autowired
 	private EmailService emailService;
-	
+
 	public Pedido find(Integer id) {
-		
+
 		Optional<Pedido> obj = repo.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto não encontrado! id " + id + ", Tipo: " + Pedido.class.getName()));
 	}
-	
+
 	public Pedido insert(Pedido obj) {
-		
+
 		obj.setId(null);
 		obj.setInstante(new Date());
 		obj.setCliente(clienteService.find(obj.getCliente().getId()));
+		obj.setStatus(Status.PENDENTE);
 		obj.getPagamento().setEstado(EstadoPagamento.PENDENTE);
 		obj.getPagamento().setPedido(obj);
-		
-		if(obj.getPagamento() instanceof PagamentoComBoleto) {
+		obj.setDesconto(null);
+
+		if (obj.getPagamento() instanceof PagamentoComBoleto) {
 			PagamentoComBoleto pagto = (PagamentoComBoleto) obj.getPagamento();
 			boletoService.preencherPagamentoComBoleto(pagto, obj.getInstante());
 		}
-		
+
 		obj = repo.save(obj);
 		pagtoRepo.save(obj.getPagamento());
-		
+
 		for (ItemPedido ip : obj.getItens()) {
 			ip.setDesconto(0.0);
 			ip.setProduto(produtoService.find(ip.getId().getProduto().getId()));
 			ip.setPreco(ip.getProduto().getPreco());
 			ip.setPedido(obj);
 		}
-		
+
 		itemPedidoRepository.saveAll(obj.getItens());
 		emailService.sendOrderConfirmationHtmlEmail(obj);
 		return obj;
-		
+
 	}
-	
+
+	public void update(PedidoDTO objDTO) {
+
+		Pedido newObj = find(objDTO.getId());
+
+		//Atualiza status do pedido
+		if (newObj.getStatus() != null && !newObj.getStatus().equals(objDTO.getStatus())) {
+			updateStatus(newObj, objDTO);
+			repo.save(newObj);
+		}
+	}
+
+	private void updateStatus(Pedido newObj, PedidoDTO objDTO) {
+		newObj.setStatus(objDTO.getStatus());
+	}
+
 	public Page<Pedido> findPage(Integer page, Integer linesPerPage, String orderBy, String direction) {
+
 		UserSS user = UserService.authenticated();
+
 		if (user == null) {
 			throw new AuthorizationException("Acesso negado");
 		}
+
 		PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
-		Cliente cliente =  clienteService.find(user.getId());
+		Cliente cliente = clienteService.find(user.getId());
+
 		return repo.findByCliente(cliente, pageRequest);
 	}
+
 }
