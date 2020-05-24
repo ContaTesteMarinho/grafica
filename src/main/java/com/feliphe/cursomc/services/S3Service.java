@@ -20,7 +20,6 @@ public class S3Service {
 
 	@Autowired
 	private AmazonS3 s3Client;
-	
 	@Value("${s3.bucket}")
 	private String bucketName;
 	

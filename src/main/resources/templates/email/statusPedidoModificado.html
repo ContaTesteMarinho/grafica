@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-<title th:remove="all">Pedido registrado</title>
+<title th:remove="all">Situação do Pedido</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 </head>
 <body>
@@ -10,8 +10,8 @@
 			Pedido número: <span th:text="${pedido.id}"> </span>
 		</h1>
 		<p> Pedido feito em: <span th:text="${#dates.format(pedido.instante, 'dd/MM/yyyy hh:mm')}"></span> </p>
-		<p> Cliente: <span th:text="${pedido.cliente.nome}"></span> </p>
-		<p> Situação do pagamento: <span th:text="${pedido.pagamento.estado.descricao}"></span> </p>
+		<!-- <p> Situação: <span th:text="${pedido.status}"></span> </p> -->
+		<h2> Situação: <span> Finalizado </span> </h2>
 		<h3>Detalhes do pedido:</h3>
 		<table border="1">
 			<tr>

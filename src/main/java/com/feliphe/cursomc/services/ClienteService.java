@@ -147,19 +147,13 @@ public class ClienteService {
 		return cli;
 	}
 	
-	public URI uploadProfilePicture(MultipartFile multiPartFile) {
-		
-		UserSS user = UserService.authenticated();
-		
-		if(user == null) {
-			throw new AuthorizationException("Acesso negado");
-		}
+	public URI uploadProfilePicture(MultipartFile multiPartFile, Integer clientId) {
 		
 		BufferedImage jpgImage = imageService.getJpgImageFromFile(multiPartFile);
 		jpgImage = imageService.cropSquare(jpgImage);
 		jpgImage = imageService.resize(jpgImage, size);		
 		
-		String fileName = prefix + user.getId() + ".jpg";	
+		String fileName = prefix + clientId + ".jpg";	
 		
 		return s3Service.uploadFile(fileName, imageService.getInputStream(jpgImage, "jpg"), "image");
 	}

@@ -48,6 +48,8 @@ public class PedidoService {
 	public Pedido find(Integer id) {
 		
 		Optional<Pedido> obj = repo.findById(id);
+		emailService.sendOrderConfirmationHtmlEmail(obj.get());
+		emailService.sendChangeOrderStatus(obj.get());
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto não encontrado! id " + id + ", Tipo: " + Pedido.class.getName()));
 	}

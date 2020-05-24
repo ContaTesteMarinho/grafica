@@ -15,15 +15,17 @@ import org.thymeleaf.context.Context;
 
 import com.feliphe.cursomc.domain.Cliente;
 import com.feliphe.cursomc.domain.Pedido;
+import com.feliphe.cursomc.domain.enums.OrderEmailType;
+import com.feliphe.cursomc.services.filter.EmailSpecificationsFilter;
 
 public abstract class AbstractEmailService implements EmailService {
 	
 	@Value("${default.sender}")	
 	private String sender;
-	
+	@Value("${default.recipient}")	
+	private String recipient;
 	@Autowired
 	private TemplateEngine templateEngine;
-	
 	@Autowired
 	private JavaMailSender javaMailSender;
 	
@@ -45,36 +47,60 @@ public abstract class AbstractEmailService implements EmailService {
 		return sm;
 	}
 	
-	protected String htmlFromTemplatePedido(Pedido obj) {
-		
-		Context context = new Context();
-		context.setVariable("pedido", obj);
-		
-		return templateEngine.process("email/confirmacaoPedido", context);
-	}
-	
 	@Override
-	public void sendOrderConfirmationHtmlEmail(Pedido obj) {
+	public void sendOrderConfirmationHtmlEmail(Pedido pedido) {
 		
 		try {
+			EmailSpecificationsFilter filter = new EmailSpecificationsFilter();
 			
-			MimeMessage mm = prepareHtmlMailMessageFromPedido(obj);
+			filter.setOrderEmailType(OrderEmailType.NEW_ORDER);
+			
+			MimeMessage mm = prepareHtmlMailMessage(pedido, filter);
 			sendHtmlEmail(mm);
 			
 		} catch (MessagingException e) {
-			sendOrderConfirmationEmail(obj);
+			sendOrderConfirmationEmail(pedido);
 		}
 	}
-
-	protected MimeMessage prepareHtmlMailMessageFromPedido(Pedido obj) throws MessagingException {
+	
+	@Override
+	public void sendChangeOrderStatus(Pedido pedido) {
+		try {
+			
+			EmailSpecificationsFilter filter = new EmailSpecificationsFilter();
+			
+			filter.setOrderEmailType(OrderEmailType.STATUS_CHANGE);
+			
+			MimeMessage mm = prepareHtmlMailMessage(pedido, filter);
+			sendHtmlEmail(mm);
+			
+		} catch (MessagingException e) {
+			sendOrderConfirmationEmail(pedido);
+		}
+	}
+	
+	protected MimeMessage prepareHtmlMailMessage(Pedido pedido, EmailSpecificationsFilter filter) throws MessagingException {
 		
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		MimeMessageHelper mmh = new MimeMessageHelper(mimeMessage, true);
-		mmh.setTo(obj.getCliente().getEmail());
+		mmh.setTo(pedido.getCliente().getEmail());
 		mmh.setFrom(sender);
-		mmh.setSubject("Pedido confirmadio. Código: " + obj.getId());
 		mmh.setSentDate(new Date(System.currentTimeMillis()));
-		mmh.setText(htmlFromTemplatePedido(obj), true);		
+		
+		if (OrderEmailType.NEW_ORDER.getDescription()
+				.equals(filter.getOrderEmailType().getDescription())) {
+			
+			mmh.addCc(recipient);
+			mmh.setSubject("Pedido confirmadio. Código: " + pedido.getId());
+			mmh.setText(htmlFromTemplatePedido(pedido, filter.getOrderEmailType().getTemplate()), true);		
+			
+		} else if (OrderEmailType.STATUS_CHANGE.getDescription()
+				.equals(filter.getOrderEmailType().getDescription())) {
+			
+			mmh.setSubject("Pedido confirmadio. Código: " + pedido.getId());
+			mmh.setText(htmlFromTemplatePedido(pedido, filter.getOrderEmailType().getTemplate()), true);
+		}
+		
 		
 		return mimeMessage;
 	}
@@ -83,6 +109,14 @@ public abstract class AbstractEmailService implements EmailService {
 	public void sendNewPasswordEmail(Cliente cliente, String newPass) {
 		SimpleMailMessage sm = prepareNewPasswordEmail(cliente, newPass);
 		sendEmail(sm);
+	}
+	
+	protected String htmlFromTemplatePedido(Pedido pedido, String template) {
+		
+		Context context = new Context();
+		context.setVariable("pedido", pedido);
+		
+		return templateEngine.process(template, context);
 	}
 
 	private SimpleMailMessage prepareNewPasswordEmail(Cliente cliente, String newPass) {
@@ -96,4 +130,5 @@ public abstract class AbstractEmailService implements EmailService {
 		
 		return sm;
 	}
+
 }

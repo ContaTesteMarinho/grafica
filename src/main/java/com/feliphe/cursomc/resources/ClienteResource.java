@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -82,13 +83,13 @@ public class ClienteResource {
 	@RequestMapping(method=RequestMethod.GET)
 	public ResponseEntity<List<ClienteDTO>> findAll() {
 		
-		List<Cliente> categorias = service.findAll();
-		List<ClienteDTO> categoriasDTO = categorias
+		List<Cliente> clientes = service.findAll();
+		List<ClienteDTO> clientesDTO = clientes
 												.stream()
-												.map(categoria -> new ClienteDTO(categoria))
+												.map(cliente -> new ClienteDTO(cliente))
 												.collect(Collectors.toList());
 		
-		return ResponseEntity.ok().body(categoriasDTO);
+		return ResponseEntity.ok().body(clientesDTO);
 	}
 	
 	@PreAuthorize("hasAnyRole('ADMIN')")
@@ -105,11 +106,12 @@ public class ClienteResource {
 		return ResponseEntity.ok().body(categoriasDTO);
 	}
 	
-	@RequestMapping(value="/picture", method=RequestMethod.POST)
+	@PostMapping("/{clientId}/picture")
 	public ResponseEntity<Void> insert(
-			@RequestParam(name="file") MultipartFile multiPartFile) {
+			@RequestParam(name="file") MultipartFile multiPartFile,
+			@PathVariable Integer clientId) {
 		
-		URI uri = service.uploadProfilePicture(multiPartFile);		
+		URI uri = service.uploadProfilePicture(multiPartFile, clientId);		
 		return ResponseEntity.created(uri).build();
 	}
 }
