@@ -8,9 +8,9 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 
-import com.feliphe.cursomc.services.DBService;
-import com.feliphe.cursomc.services.EmailService;
-import com.feliphe.cursomc.services.SmtpEmailService;
+import com.feliphe.cursomc.email.service.EmailService;
+import com.feliphe.cursomc.email.service.SmtpEmailService;
+import com.feliphe.cursomc.util.service.DBService;
 
 @Configuration
 @Profile("dev")
