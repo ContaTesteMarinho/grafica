@@ -5,8 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.feliphe.cursomc.domain.PagamentoComBoleto;
-import com.feliphe.cursomc.domain.PagamentoComCartao;
+import com.feliphe.cursomc.pagamento.domain.PagamentoComBoleto;
+import com.feliphe.cursomc.pagamento.domain.PagamentoComCartao;
 
 @Configuration
 public class JacksonConfig {
