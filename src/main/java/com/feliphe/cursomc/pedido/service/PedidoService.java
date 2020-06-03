@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.feliphe.cursomc.cliente.domain.Cliente;
 import com.feliphe.cursomc.cliente.service.ClienteService;
 import com.feliphe.cursomc.desconto.domain.enums.Status;
+import com.feliphe.cursomc.desconto.service.DescontoService;
 import com.feliphe.cursomc.email.service.EmailService;
 import com.feliphe.cursomc.exception.AuthorizationException;
 import com.feliphe.cursomc.exception.ObjectNotFoundException;
@@ -51,6 +52,9 @@ public class PedidoService {
 
 	@Autowired
 	private EmailService emailService;
+	
+	@Autowired
+	private DescontoService descontoService;
 
 	public Pedido find(Integer id) {
 
@@ -67,7 +71,10 @@ public class PedidoService {
 		obj.setStatus(Status.PENDENTE);
 		obj.getPagamento().setEstado(EstadoPagamento.PENDENTE);
 		obj.getPagamento().setPedido(obj);
-		obj.setDesconto(null);
+		
+		if (obj.getDesconto() != null) {
+			obj.setDesconto(descontoService.find(obj.getDesconto().getId()));			
+		}
 
 		if (obj.getPagamento() instanceof PagamentoComBoleto) {
 			PagamentoComBoleto pagto = (PagamentoComBoleto) obj.getPagamento();
@@ -78,7 +85,6 @@ public class PedidoService {
 		pagtoRepo.save(obj.getPagamento());
 
 		for (ItemPedido ip : obj.getItens()) {
-			ip.setDesconto(0.0);
 			ip.setProduto(produtoService.find(ip.getId().getProduto().getId()));
 			ip.setPreco(ip.getProduto().getPreco());
 			ip.setPedido(obj);

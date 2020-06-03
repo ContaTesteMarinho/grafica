@@ -1,11 +1,9 @@
 package com.feliphe.cursomc.pedido.domain;
 
 import java.io.Serializable;
-import java.text.NumberFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -65,10 +63,6 @@ public class Pedido implements Serializable {
 		this.instante = instante;
 		this.cliente = cliente;
 		this.enderecoDeEntrega = enderecoDeEntrega;
-	}
-
-	public double getValorTotal() {
-		return itens.stream().mapToDouble(itemPedido -> itemPedido.getSubTotal()).sum();
 	}
 
 	public Integer getId() {
@@ -163,7 +157,6 @@ public class Pedido implements Serializable {
 	@Override
 	public String toString() {
 
-		NumberFormat nf = NumberFormat.getCurrencyInstance(new Locale("pt", "BR"));
 		SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 		StringBuilder builder = new StringBuilder();
 		builder.append("Pedido número: ");
@@ -179,9 +172,6 @@ public class Pedido implements Serializable {
 		for (ItemPedido ip : itens) {
 			builder.append(ip.toString());
 		}
-
-		builder.append("Valor total: ");
-		builder.append(nf.format(getValorTotal()));
 
 		return builder.toString();
 	}
