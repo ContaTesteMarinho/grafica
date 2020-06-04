@@ -48,7 +48,7 @@ public class PedidoResource {
 	@RequestMapping(value = "/{id}", method = RequestMethod.PATCH)
 	public ResponseEntity<Void> update(@PathVariable Integer id, @Valid @RequestBody PedidoDTO objDTO) {
 
-		objDTO.setId(id); 
+		objDTO.setId(id);
 		service.update(objDTO);
 
 		return ResponseEntity.noContent().build();
@@ -64,5 +64,5 @@ public class PedidoResource {
 		Page<Pedido> pedidos = service.findPage(page, linesPerPage, orderBy, direction);
 		return ResponseEntity.ok().body(pedidos);
 	}
-	
+
 }

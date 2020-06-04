@@ -1,9 +1,11 @@
 package com.feliphe.cursomc.desconto.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.feliphe.cursomc.desconto.domain.Desconto;
@@ -23,6 +25,10 @@ public class DescontoService {
 		Optional<Desconto> obj = descontoRepository.findById(id);
 		return obj.orElseThrow(() -> new ObjectNotFoundException(
 				"Objeto não encontrado! id " + id + ", Tipo: " + Desconto.class.getName()));
+	}
+
+	public List<Desconto> list(Pageable pageable) {
+		return descontoRepository.list(pageable);
 	}
 
 	public Desconto insert(DescontoDTO dto) {
