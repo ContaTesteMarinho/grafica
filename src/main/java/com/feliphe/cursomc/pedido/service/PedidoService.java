@@ -1,11 +1,13 @@
 package com.feliphe.cursomc.pedido.service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
@@ -52,7 +54,7 @@ public class PedidoService {
 
 	@Autowired
 	private EmailService emailService;
-	
+
 	@Autowired
 	private DescontoService descontoService;
 
@@ -63,6 +65,15 @@ public class PedidoService {
 				"Objeto não encontrado! id " + id + ", Tipo: " + Pedido.class.getName()));
 	}
 
+	public List<Pedido> listByCliente(Integer clienteId, Pageable pageable) {
+
+		if (clienteId == null) {
+			throw new AuthorizationException("Acesso negado");
+		}
+
+		return repo.listByCliente(clienteId, pageable);
+	}
+
 	public Pedido insert(Pedido obj) {
 
 		obj.setId(null);
@@ -71,9 +82,9 @@ public class PedidoService {
 		obj.setStatus(Status.PENDENTE);
 		obj.getPagamento().setEstado(EstadoPagamento.PENDENTE);
 		obj.getPagamento().setPedido(obj);
-		
+
 		if (obj.getDesconto() != null) {
-			obj.setDesconto(descontoService.find(obj.getDesconto().getId()));			
+			obj.setDesconto(descontoService.find(obj.getDesconto().getId()));
 		}
 
 		if (obj.getPagamento() instanceof PagamentoComBoleto) {
@@ -100,7 +111,7 @@ public class PedidoService {
 
 		Pedido newObj = find(objDTO.getId());
 
-		//Atualiza status do pedido
+		// Atualiza status do pedido
 		if (newObj.getStatus() != null && !newObj.getStatus().equals(objDTO.getStatus())) {
 			updateStatus(newObj, objDTO);
 			repo.save(newObj);
