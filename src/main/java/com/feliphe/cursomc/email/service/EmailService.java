@@ -18,4 +18,6 @@ public interface EmailService {
 	void sendHtmlEmail(MimeMessage msg);
 
 	void sendNewPasswordEmail(Cliente cliente, String newPass);
+	
+	void sendChangeOrderStatus(Pedido pedido);
 }
