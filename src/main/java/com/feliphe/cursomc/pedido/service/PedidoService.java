@@ -11,7 +11,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.feliphe.cursomc.cliente.domain.Cliente;
 import com.feliphe.cursomc.cliente.service.ClienteService;
 import com.feliphe.cursomc.desconto.domain.enums.Status;
 import com.feliphe.cursomc.desconto.service.DescontoService;
@@ -36,25 +35,18 @@ public class PedidoService {
 
 	@Autowired
 	private PedidoRepository repo;
-
 	@Autowired
 	private BoletoService boletoService;
-
 	@Autowired
 	private PagamentoRepository pagtoRepo;
-
 	@Autowired
 	private ProdutoService produtoService;
-
 	@Autowired
 	private ItemPedidoRepository itemPedidoRepository;
-
 	@Autowired
 	private ClienteService clienteService;
-
 	@Autowired
 	private EmailService emailService;
-
 	@Autowired
 	private DescontoService descontoService;
 
@@ -110,12 +102,12 @@ public class PedidoService {
 	public void update(PedidoDTO objDTO) {
 
 		Pedido newObj = find(objDTO.getId());
-
-		// Atualiza status do pedido
-		if (newObj.getStatus() != null && !newObj.getStatus().equals(objDTO.getStatus())) {
-			updateStatus(newObj, objDTO);
-			repo.save(newObj);
-		}
+		
+		//Atualiza status do pedido
+		updateStatus(newObj, objDTO);
+		repo.save(newObj);
+		
+		emailService.sendChangeOrderStatus(newObj);
 	}
 
 	private void updateStatus(Pedido newObj, PedidoDTO objDTO) {
@@ -131,9 +123,9 @@ public class PedidoService {
 		}
 
 		PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
-		Cliente cliente = clienteService.find(user.getId());
+		//Cliente cliente = clienteService.find(user.getId());
 
-		return repo.findByCliente(cliente, pageRequest);
+		return repo.findAll(pageRequest);
 	}
 
 }

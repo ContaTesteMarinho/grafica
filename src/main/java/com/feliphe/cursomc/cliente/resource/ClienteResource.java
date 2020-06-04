@@ -126,4 +126,21 @@ public class ClienteResource {
 		URI uri = service.uploadProfilePicture(multiPartFile);		
 		return ResponseEntity.created(uri).build();
 	}
+	
+	/*
+	 * @GetMapping("/{clientId}/pedidos") public ResponseEntity<Page<Pedido>>
+	 * pedidosCliente(@PathVariable Integer clientId,
+	 * 
+	 * @RequestParam(value = "page", defaultValue = "0") Integer page,
+	 * 
+	 * @RequestParam(value = "linesPerPage", defaultValue = "24") Integer
+	 * linesPerPage,
+	 * 
+	 * @RequestParam(value = "orderBy", defaultValue = "instante") String orderBy,
+	 * 
+	 * @RequestParam(value = "direction", defaultValue = "DESC") String direction) {
+	 * 
+	 * Page<Pedido> pedidos = service.findPage(page, linesPerPage, orderBy,
+	 * direction); return ResponseEntity.ok().body(pedidos); }
+	 */
 }

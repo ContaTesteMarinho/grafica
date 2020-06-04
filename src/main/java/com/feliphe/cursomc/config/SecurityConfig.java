@@ -43,17 +43,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 		"/produtos/**",
 		"/categorias/**",
 		"/estados/**",
-		"/pedidos/**",
-		"/clientes/**"
+		"/pedidos/**"
 	};
 	
-	private static final String[] PUBLIC_MATCHERS_GET = {
-			"/produtos/**",
-			"/categorias/**",
-			"/estados/**",
-			"/pedidos/**",
-			"/clientes/**"
-	};
+	private static final String[] PUBLIC_MATCHERS_GET = {"/clientes/**"};
 	
 	private static final String[] PUBLIC_MATCHERS_POST = {
 			"/clientes",
@@ -98,7 +91,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter{
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {		
 		CorsConfiguration configuration = new CorsConfiguration().applyPermitDefaultValues();
-		configuration.setAllowedMethods(Arrays.asList("POST","GET","PUT","OPTIONS","DELETE"));
+		configuration.setAllowedMethods(Arrays.asList("POST","GET","PUT","OPTIONS","DELETE", "PATCH"));
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
