@@ -2,10 +2,13 @@ package com.feliphe.cursomc.desconto.resource;
 
 
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +34,19 @@ public class DescontoResource {
 
 		Desconto obj = service.find(id);
 		return ResponseEntity.ok().body(new DescontoDTO(obj));
+	}
+	
+	@RequestMapping(method = RequestMethod.GET)
+	public ResponseEntity<List<DescontoDTO>> list(Pageable pageable) {
+
+		List<Desconto> entities = service.list(pageable);
+		
+		List<DescontoDTO> resources = new ArrayList<>();
+		for (Desconto entity : entities) {
+			resources.add(new DescontoDTO(entity));
+		}
+
+		return ResponseEntity.ok().body(resources);
 	}
 	
 	@PreAuthorize("hasAnyRole('ADMIN')")

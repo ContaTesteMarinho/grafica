@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,8 @@ import com.feliphe.cursomc.cliente.domain.Cliente;
 import com.feliphe.cursomc.cliente.dto.ClienteDTO;
 import com.feliphe.cursomc.cliente.dto.ClienteNewDTO;
 import com.feliphe.cursomc.cliente.service.ClienteService;
+import com.feliphe.cursomc.pedido.domain.Pedido;
+import com.feliphe.cursomc.pedido.service.PedidoService;
 
 @RestController
 @RequestMapping(value="/clientes")
@@ -31,12 +34,23 @@ public class ClienteResource {
 	@Autowired
 	ClienteService service;
 	
+	@Autowired
+	PedidoService pedidoService;
+	
 	@RequestMapping(value="/{id}", method=RequestMethod.GET)
 	public ResponseEntity<?> buscar(@PathVariable Integer id) {
 		
 		Cliente obj = service.find(id);
 		return ResponseEntity.ok().body(obj);
 	}
+	
+	@RequestMapping(value = "/{clienteId}/pedidos", method = RequestMethod.GET)
+	public ResponseEntity<List<Pedido>> listByCliente(@PathVariable Integer clienteId, Pageable pageable) {
+
+		List<Pedido> entities = pedidoService.listByCliente(clienteId, pageable);
+		return ResponseEntity.ok().body(entities);
+	}
+
 	
 	@RequestMapping(value="/email", method=RequestMethod.GET)
 	public ResponseEntity<?> findByEmail(@RequestParam(value="value") String email) {
@@ -112,4 +126,21 @@ public class ClienteResource {
 		URI uri = service.uploadProfilePicture(multiPartFile);		
 		return ResponseEntity.created(uri).build();
 	}
+	
+	/*
+	 * @GetMapping("/{clientId}/pedidos") public ResponseEntity<Page<Pedido>>
+	 * pedidosCliente(@PathVariable Integer clientId,
+	 * 
+	 * @RequestParam(value = "page", defaultValue = "0") Integer page,
+	 * 
+	 * @RequestParam(value = "linesPerPage", defaultValue = "24") Integer
+	 * linesPerPage,
+	 * 
+	 * @RequestParam(value = "orderBy", defaultValue = "instante") String orderBy,
+	 * 
+	 * @RequestParam(value = "direction", defaultValue = "DESC") String direction) {
+	 * 
+	 * Page<Pedido> pedidos = service.findPage(page, linesPerPage, orderBy,
+	 * direction); return ResponseEntity.ok().body(pedidos); }
+	 */
 }

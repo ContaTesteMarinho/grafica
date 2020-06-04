@@ -10,8 +10,8 @@ import com.feliphe.cursomc.cliente.domain.Cliente;
 import com.feliphe.cursomc.pedido.domain.Pedido;
 
 @Repository
-public interface PedidoRepository extends JpaRepository<Pedido, Integer>{
+public interface PedidoRepository extends JpaRepository<Pedido, Integer>, PedidoCustomRepository {
 
-	@Transactional(readOnly=true)
+	@Transactional(readOnly = true)
 	Page<Pedido> findByCliente(Cliente cliente, Pageable pageRequest);
 }

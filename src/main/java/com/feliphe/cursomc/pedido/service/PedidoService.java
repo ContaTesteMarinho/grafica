@@ -1,15 +1,16 @@
 package com.feliphe.cursomc.pedido.service;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
-import com.feliphe.cursomc.cliente.domain.Cliente;
 import com.feliphe.cursomc.cliente.service.ClienteService;
 import com.feliphe.cursomc.desconto.domain.enums.Status;
 import com.feliphe.cursomc.desconto.service.DescontoService;
@@ -34,25 +35,18 @@ public class PedidoService {
 
 	@Autowired
 	private PedidoRepository repo;
-
 	@Autowired
 	private BoletoService boletoService;
-
 	@Autowired
 	private PagamentoRepository pagtoRepo;
-
 	@Autowired
 	private ProdutoService produtoService;
-
 	@Autowired
 	private ItemPedidoRepository itemPedidoRepository;
-
 	@Autowired
 	private ClienteService clienteService;
-
 	@Autowired
 	private EmailService emailService;
-	
 	@Autowired
 	private DescontoService descontoService;
 
@@ -63,6 +57,15 @@ public class PedidoService {
 				"Objeto não encontrado! id " + id + ", Tipo: " + Pedido.class.getName()));
 	}
 
+	public List<Pedido> listByCliente(Integer clienteId, Pageable pageable) {
+
+		if (clienteId == null) {
+			throw new AuthorizationException("Acesso negado");
+		}
+
+		return repo.listByCliente(clienteId, pageable);
+	}
+
 	public Pedido insert(Pedido obj) {
 
 		obj.setId(null);
@@ -71,9 +74,9 @@ public class PedidoService {
 		obj.setStatus(Status.PENDENTE);
 		obj.getPagamento().setEstado(EstadoPagamento.PENDENTE);
 		obj.getPagamento().setPedido(obj);
-		
+
 		if (obj.getDesconto() != null) {
-			obj.setDesconto(descontoService.find(obj.getDesconto().getId()));			
+			obj.setDesconto(descontoService.find(obj.getDesconto().getId()));
 		}
 
 		if (obj.getPagamento() instanceof PagamentoComBoleto) {
@@ -99,12 +102,12 @@ public class PedidoService {
 	public void update(PedidoDTO objDTO) {
 
 		Pedido newObj = find(objDTO.getId());
-
+		
 		//Atualiza status do pedido
-		if (newObj.getStatus() != null && !newObj.getStatus().equals(objDTO.getStatus())) {
-			updateStatus(newObj, objDTO);
-			repo.save(newObj);
-		}
+		updateStatus(newObj, objDTO);
+		repo.save(newObj);
+		
+		emailService.sendChangeOrderStatus(newObj);
 	}
 
 	private void updateStatus(Pedido newObj, PedidoDTO objDTO) {
@@ -120,9 +123,9 @@ public class PedidoService {
 		}
 
 		PageRequest pageRequest = PageRequest.of(page, linesPerPage, Direction.valueOf(direction), orderBy);
-		Cliente cliente = clienteService.find(user.getId());
+		//Cliente cliente = clienteService.find(user.getId());
 
-		return repo.findByCliente(cliente, pageRequest);
+		return repo.findAll(pageRequest);
 	}
 
 }
